@@ -37,7 +37,12 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
                             LotteryBall().make(number),
                         )?.toList() ?? [],
                       ),
-                      Text("${(model.favorites[index].coverage5thPrize*100/8145060).toStringAsFixed(1)}%"),
+                      model.favorites[index].coverage5thPrize == null?
+                        SizedBox(
+                          width: 20, height: 20,
+                          child: CircularProgressIndicator(),
+                        )
+                        : Text("${(model.favorites[index].coverage5thPrize*100/8145060).toStringAsFixed(1)}%")
                     ],
                   ),
                   onTap: ()=>{
