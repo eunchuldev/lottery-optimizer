@@ -4,13 +4,13 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'native.dart';
 
 
 class AppState extends Model {
   List<TicketSet> _favorites = [];
   void favorite(TicketSet ticketSet) {
     _favorites.insert(0, ticketSet);
-    print(_favorites);
     notifyListeners();
     _save();
   }
@@ -18,6 +18,9 @@ class AppState extends Model {
     _favorites.removeAt(0);
     notifyListeners();
     _save();
+  }
+  void coverageUpdated() {
+    notifyListeners();
   }
   List<TicketSet> get favorites {
     return List.from(_favorites);
@@ -100,7 +103,8 @@ class TicketSet {
   }
   Future<int> calculateCoverage() async {
     _coverage4thPrize = await compute(coverageN_6_4,  _tickets);
-    _coverage5thPrize = await compute(coverageN_6_3,  _tickets);
+    //_coverage4thPrize = 0;
+    _coverage5thPrize = await compute(coverage5thPrizeD,  _tickets);
     return _coverage5thPrize;
   }
 }

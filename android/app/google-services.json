@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "86279554658",
+    "firebase_url": "https://lottery-optimizer.firebaseio.com",
+    "project_id": "lottery-optimizer",
+    "storage_bucket": "lottery-optimizer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86279554658:android:99e585b44b1eeb7be6733b",
+        "android_client_info": {
+          "package_name": "com.lottery_optimizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "86279554658-7vo3g4pbss02v1ojhtv1027a1puo8anb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyCoJAkR9MQqXT8rK63EUFiVfROiZUXQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "86279554658-7vo3g4pbss02v1ojhtv1027a1puo8anb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

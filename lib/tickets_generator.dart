@@ -3,6 +3,7 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'state.dart';
 
+
 class TicketsGenerator extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _TicketsGenerator();
@@ -14,7 +15,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   bool favorite = false;
 
   int _count = 0;
-  void generateRandomTicketSet() {
+  void generateRandomTicketSet(AppState model) {
     setState(() {
       ticketSet = TicketSet.random(ticketsNum);
       favorite = false;
@@ -24,9 +25,10 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       setState(() {
         ticketSet = ticketSet;
       });
+      model.coverageUpdated();
     });
   }
-  void generateOptimizedTicketSet() {
+  void generateOptimizedTicketSet(AppState model) {
     setState(() {
       favorite = false;
       _count += 1;
@@ -39,13 +41,17 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
         setState(() {
           ticketSet = ticketSet;
         });
+        model.coverageUpdated();
       });
     });
   }
 
+
+  TextStyle topPannelTextStyle() => DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.2, color: Colors.white);
+
   Widget ticketsNumField() =>
     ButtonTheme(
-      minWidth: 50.0,
+      minWidth: 60.0,
       textTheme: ButtonTextTheme.normal,
       child: RaisedButton(
         onPressed: () => showDialog<int>(
@@ -75,31 +81,36 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
         ),
       child: Card(
         margin: EdgeInsets.zero,
-        elevation: 4.0,
-        child:Container(
+        //elevation: 4.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
+        child: Container(
           color: Theme.of(context).primaryColor,
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 20.0),
           child: ListView (
             shrinkWrap: true,
             children: [
               ListTile(
-                title: Text("로또번호 갯수"),
+                title: Text("로또번호 갯수", style: topPannelTextStyle()),
                 trailing: ticketsNumField(),
               ),
               ListTile(
                 title: Row(
                   children: [
                     Expanded( child: Padding(
-                      child: RaisedButton(
-                        child: Text("랜덤생성"),
-                        onPressed: () => generateRandomTicketSet(),
+                      child: ScopedModelDescendant<AppState>(
+                        builder: (context, child, model) => RaisedButton(
+                          child: Text("랜덤생성", style: topPannelTextStyle()),
+                          onPressed: () => generateRandomTicketSet(model),
+                          shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
+                        ),
                       ),
                       padding: EdgeInsets.only(right:8.0),
                     )),
                     Expanded( child: Padding(
                       child: RaisedButton(
-                        child: Text("직접입력"),
+                        child: Text("직접입력", style: topPannelTextStyle()),
                         onPressed: () => "",
+                        shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
                       ),
                       padding: EdgeInsets.only(left:8.0),
                     )),
@@ -107,12 +118,15 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                 ),
               ),
               ListTile(
-                title: RaisedButton(
-                  child: Text("최적화 로또번호세트 생성"),
-                  onPressed: () async => await generateOptimizedTicketSet(),
-                  color: Colors.orange,
-                  textColor: Colors.white,
-                ),
+                title: 
+                  ScopedModelDescendant<AppState>(
+                    builder: (context, child, model) => RaisedButton(
+                      child: Text("최적화 로또번호세트 생성", style: topPannelTextStyle()),
+                      onPressed: () async => await generateOptimizedTicketSet(model),
+                      color: Colors.orange,
+                      textColor: Colors.white,
+                      shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
+                    ),),
               ),
             ],
           ),
@@ -150,20 +164,28 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
 
   Widget ticketSetPannel() => 
     Container(
-      child: ListView.separated(
-        physics: const BouncingScrollPhysics(), 
-        itemCount: ticketSet?.tickets?.length ?? 0,
-        itemBuilder: (context, index) => ListTile(
-          leading: Text("#${index+1}"),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ticketSet?.tickets[index].map((number) =>
-              LotteryBall(number),
-            )?.toList() ?? [],
+      child: ticketSet == null? 
+        Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text("위 버튼을 클릭해 번호를 생성해보세요.", style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.5)),
+        ):
+        Padding(
+          padding: EdgeInsets.only(top: 12.0),
+          child: ListView.separated(
+            physics: const BouncingScrollPhysics(), 
+            itemCount: ticketSet?.tickets?.length ?? 0,
+            itemBuilder: (context, index) => ListTile(
+              leading: Text("#${index+1}"),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: ticketSet?.tickets[index].map((number) =>
+                  LotteryBall(number),
+                )?.toList() ?? [],
+              ),
+            ),
+            separatorBuilder: (context, index) => Divider(),
           ),
         ),
-        separatorBuilder: (context, index) => Divider(),
-      ),
       key: ValueKey<int>(_count),
     );
 
@@ -285,8 +307,11 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   void initState() {
     super.initState();
   }
-
+  @override
+  void dispose() {
+    super.dispose();
+  }
   @override
   bool get wantKeepAlive => true;
 
-  }
+}
