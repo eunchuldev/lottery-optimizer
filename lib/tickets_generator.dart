@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'dart:math';
 import 'state.dart';
 
 
@@ -9,10 +12,18 @@ class TicketsGenerator extends StatefulWidget {
   State<StatefulWidget> createState() => _TicketsGenerator();
 }
 
-class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveClientMixin<TicketsGenerator> {
+class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveClientMixin<TicketsGenerator>, SingleTickerProviderStateMixin  {
   TicketSet ticketSet;
   int ticketsNum = 50;
   bool favorite = false;
+  bool calculating = false;
+  bool manualFeeding = false;
+  bool keyboardUp = false;
+  bool statsExpanded = false;
+  TextEditingController _manualFeedingTextController = TextEditingController();
+
+  //FocusNode focusNode = new FocusNode();
+
 
   int _count = 0;
   void generateRandomTicketSet(AppState model) {
@@ -21,12 +32,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       favorite = false;
       _count += 1;
     });
-    ticketSet.calculateCoverage().then((res) {
-      setState(() {
-        ticketSet = ticketSet;
-      });
-      model.coverageUpdated();
-    });
+    calculateCoverage(model);
   }
   void generateOptimizedTicketSet(AppState model) {
     setState(() {
@@ -37,15 +43,46 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       setState(() {
         ticketSet = _ticketsSet;
       });
+      calculateCoverage(model);
+    });
+  }
+  void calculateCoverage(AppState model) {
+      setState(() {
+        calculating = true;
+      });
       ticketSet.calculateCoverage().then((res) {
         setState(() {
+          calculating = false;
           ticketSet = ticketSet;
         });
         model.coverageUpdated();
       });
+  }
+  void manualFeedingStart() {
+    _manualFeedingTextController.value = TextEditingValue(
+      text: ticketSet?.tickets
+        ?.map((ticket) => ticket.map((i) => i.toString()).join(" "))
+        ?.join("\n") ?? "");
+    setState(() {
+      manualFeeding = true;
     });
   }
-
+  void manualFeedingEnd(model) {
+    setState(() {
+      manualFeeding = false;
+      if(_manualFeedingTextController.text == "")
+        ticketSet = null;
+      else
+        ticketSet = TicketSet(
+          _manualFeedingTextController.text
+            .split("\n")
+            .map((line)=>line.split(" ").map((str) => min(max(int.parse(str), 1), 45)).toList().cast<int>()..sort())
+            .where((list) => list.length == 6)
+            .toList().cast<List<int>>()
+        );
+    });
+    calculateCoverage(model);
+  }
 
   TextStyle topPannelTextStyle() => DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.2, color: Colors.white);
 
@@ -75,62 +112,65 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       ),
     );
   Widget topPannel() =>
-    Theme(
-      data: Theme.of(context).copyWith(
-        textTheme: TextTheme(body1: TextStyle(color: Colors.white)),
-        ),
-      child: Card(
-        margin: EdgeInsets.zero,
-        //elevation: 4.0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
-        child: Container(
-          color: Theme.of(context).primaryColor,
-          padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 20.0),
-          child: ListView (
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                title: Text("로또번호 갯수", style: topPannelTextStyle()),
-                trailing: ticketsNumField(),
-              ),
-              ListTile(
-                title: Row(
-                  children: [
-                    Expanded( child: Padding(
-                      child: ScopedModelDescendant<AppState>(
-                        builder: (context, child, model) => RaisedButton(
-                          child: Text("랜덤생성", style: topPannelTextStyle()),
-                          onPressed: () => generateRandomTicketSet(model),
+    Visibility(
+      visible: !keyboardUp,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          textTheme: TextTheme(body1: TextStyle(color: Colors.white)),
+          ),
+        child: Card(
+          margin: EdgeInsets.zero,
+          //elevation: 4.0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
+          child: Container(
+            color: Theme.of(context).primaryColor,
+            padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 20.0),
+            child: ListView (
+              shrinkWrap: true,
+              children: [
+                ListTile(
+                  title: Text("로또번호 갯수", style: topPannelTextStyle()),
+                  trailing: ticketsNumField(),
+                ),
+                ListTile(
+                  title: Row(
+                    children: [
+                      Expanded( child: Padding(
+                        child: ScopedModelDescendant<AppState>(
+                          builder: (context, child, model) => RaisedButton(
+                            child: Text("랜덤생성", style: topPannelTextStyle()),
+                            onPressed: () => generateRandomTicketSet(model),
+                            shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
+                          ),
+                        ),
+                        padding: EdgeInsets.only(right:8.0),
+                      )),
+                      Expanded( child: Padding(
+                        child: RaisedButton(
+                          child: Text("직접입력", style: topPannelTextStyle()),
+                          onPressed: () => manualFeedingStart(),
                           shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
                         ),
-                      ),
-                      padding: EdgeInsets.only(right:8.0),
-                    )),
-                    Expanded( child: Padding(
-                      child: RaisedButton(
-                        child: Text("직접입력", style: topPannelTextStyle()),
-                        onPressed: () => "",
-                        shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
-                      ),
-                      padding: EdgeInsets.only(left:8.0),
-                    )),
-                  ],
+                        padding: EdgeInsets.only(left:8.0),
+                      )),
+                    ],
+                  ),
                 ),
-              ),
-              ListTile(
-                title: 
-                  ScopedModelDescendant<AppState>(
-                    builder: (context, child, model) => RaisedButton(
-                      child: Text("최적화 로또번호세트 생성", style: topPannelTextStyle()),
-                      onPressed: () async => await generateOptimizedTicketSet(model),
-                      color: Colors.orange,
-                      textColor: Colors.white,
-                      shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
-                    ),),
-              ),
-            ],
-          ),
-        )),
+                ListTile(
+                  title: 
+                    ScopedModelDescendant<AppState>(
+                      builder: (context, child, model) => RaisedButton(
+                        child: Text("최적화 로또번호세트 생성", style: topPannelTextStyle()),
+                        onPressed: () async => await generateOptimizedTicketSet(model),
+                        color: Colors.orange,
+                        textColor: Colors.white,
+                        shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
+                      ),),
+                ),
+              ],
+            ),
+          )),
+      )
     );
   Widget LotteryBall(int number) => 
     Stack(
@@ -161,20 +201,46 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       ],
     );
 
-
   Widget ticketSetPannel() => 
     Container(
-      child: ticketSet == null? 
-        Padding(
+      constraints: BoxConstraints(
+        minWidth: double.infinity,
+        minHeight: double.infinity,
+      ),
+      child: manualFeeding? 
+        ScopedModelDescendant<AppState>(
+          builder: (context, child, model) => 
+            TextField(
+              autofocus: true,
+              expands: true,
+              decoration: InputDecoration(
+                hintText: "번호를 직접 입력해보세요. ex) 1 3 7 13 24 31", 
+                contentPadding: const EdgeInsets.all(12.0),
+              ),
+              inputFormatters: [WhitelistingTextInputFormatter(RegExp(r'[\d\s]+')), LotteryBallTextFormatter()], 
+              controller: _manualFeedingTextController,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              maxLines: null,
+              onTap: () {
+                setState(() => keyboardUp = true);
+              },
+              onSubmitted: (String text) {
+                manualFeedingEnd(model);
+              },
+            ),
+          )
+        : ticketSet == null? 
+        Center(child:Padding(
           padding: EdgeInsets.all(20.0),
           child: Text("위 버튼을 클릭해 번호를 생성해보세요.", style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.5)),
-        ):
-        Padding(
-          padding: EdgeInsets.only(top: 12.0),
-          child: ListView.separated(
-            physics: const BouncingScrollPhysics(), 
-            itemCount: ticketSet?.tickets?.length ?? 0,
-            itemBuilder: (context, index) => ListTile(
+        )):
+        ListView.separated(
+          physics: const BouncingScrollPhysics(), 
+          itemCount: ticketSet?.tickets?.length ?? 0,
+          itemBuilder: (context, index) => /*ScopedModelDescendant<AppState>(
+            builder: (context, child, model) => */
+            ListTile(
               leading: Text("#${index+1}"),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -183,8 +249,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                 )?.toList() ?? [],
               ),
             ),
-            separatorBuilder: (context, index) => Divider(),
-          ),
+          separatorBuilder: (context, index) => Divider(),
         ),
       key: ValueKey<int>(_count),
     );
@@ -202,26 +267,53 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
             ),
           ),
         ),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            ListTile(
+        child: 
+          FlatButton(
+            padding: EdgeInsets.all(0),
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            onPressed: () {
+              setState(() => statsExpanded = !statsExpanded);
+            },
+            child:ListTile(
+              leading: statsExpanded? 
+                Icon(Icons.keyboard_arrow_down): Icon(Icons.keyboard_arrow_up),
               title: 
                 IntrinsicHeight(
                 child:Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ticketSet?.coverage5thPrize == null? 
-                      Row(
+                  children: [ ticketSet?.coverage5thPrize == null || calculating? 
+                    Row(
+                      children: [
+                        Text("당첨확률 계산중..   "),
+                        SizedBox(
+                          width: 20, height: 20,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ],
+                    ) :
+                    statsExpanded? 
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("당첨확률 계산중..   "),
-                          SizedBox(
-                            width: 20, height: 20,
-                            child: CircularProgressIndicator(),
-                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical:4.0),
+                            child:Text("1등: ${ticketSet.coverage1thPrize} / ${8145060} (${((ticketSet.coverage1thPrize ?? 0)*100/8145060).toStringAsFixed(4)}%)")), 
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical:4.0),
+                            child:Text("2등: ${ticketSet.coverage2thPrize} / ${8145060*45} (${((ticketSet.coverage3thPrize ?? 0)*100/8145060/45).toStringAsFixed(3)}%)")), 
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical:4.0),
+                            child:Text("3등: ${ticketSet.coverage3thPrize} / 8145060 (${((ticketSet.coverage3thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical:4.0),
+                            child:Text("4등: ${ticketSet.coverage4thPrize} / 8145060 (${((ticketSet.coverage4thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical:4.0),
+                            child:Text("5등: ${ticketSet.coverage5thPrize} / 8145060 (${((ticketSet.coverage5thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
                         ],
-                      ) :
-                      Row(
+                      )
+                      : Row(
                         children: [
                           Text("${((ticketSet.coverage5thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%로 5등 당첨"), 
                           VerticalDivider(
@@ -267,7 +359,6 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                   ]
                 )),
             ),
-          ],
         ),
       ),
     );
@@ -306,6 +397,11 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   @override
   void initState() {
     super.initState();
+    KeyboardVisibilityNotification().addNewListener(
+      onChange: (bool visible) => setState(() {
+        keyboardUp = visible;
+      }),
+    );
   }
   @override
   void dispose() {
@@ -314,4 +410,22 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   @override
   bool get wantKeepAlive => true;
 
+}
+class LotteryBallTextFormatter extends TextInputFormatter {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.length == 0) {
+      return newValue.copyWith(text: '');
+    } else {
+      List splited = newValue.text.split(RegExp('\\s+'))
+        .where((l) => l != null)
+        .toList();
+      String formatted = splited.fold([[]], (list, x) =>
+        list.last.length == 6 ? (list..add([x])) : (list..last.add(x))
+      ).map((l) => l.join(" ")).join("\n");
+      return TextEditingValue(
+        text: formatted, 
+        selection: TextSelection.collapsed(offset: min(newValue.selection.end, formatted.length),),
+        );
+    }
+  }
 }

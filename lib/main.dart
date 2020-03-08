@@ -24,6 +24,8 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
           length: 3,
           initialIndex: 1,
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomPadding: false,
             appBar: AppBar(
               bottom: TabBar(
                 tabs: [
@@ -81,7 +83,6 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
           paddingBottom = 0.0;
         });
       }
-      print("+++++++++++++++++++BannerAd $event");
     });
 
   @override

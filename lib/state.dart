@@ -29,7 +29,7 @@ class AppState extends Model {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var json_data = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
     _favorites = json_data['favorites']?.map((ticket_json) => 
-      TicketSet.fromJson(ticket_json))?.toList() ?? [];
+      TicketSet.fromJson(ticket_json))?.toList().cast<TicketSet>() ?? [];
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,11 +50,17 @@ class TicketSet {
   List<List<int>> _tickets;
   int _coverage5thPrize;
   int _coverage4thPrize;
+  int _coverage3thPrize;
+  int _coverage2thPrize;
+  int _coverage1thPrize;
   DateTime _createdAt = DateTime.now();
 
   List<List<int>> get tickets => _tickets;
   int get coverage5thPrize => _coverage5thPrize;
   int get coverage4thPrize => _coverage4thPrize;
+  int get coverage3thPrize => _coverage3thPrize;
+  int get coverage2thPrize => _coverage2thPrize;
+  int get coverage1thPrize => _coverage1thPrize;
   DateTime get createdAt => _createdAt;
   TicketSet(this._tickets);
   TicketSet.empty();
@@ -63,12 +69,18 @@ class TicketSet {
     'tickets': _tickets,
     'coverage5thPrize': _coverage5thPrize,
     'coverage4thPrize': _coverage4thPrize,
+    'coverage3thPrize': _coverage3thPrize,
+    'coverage2thPrize': _coverage2thPrize,
+    'coverage1thPrize': _coverage1thPrize,
     'createdAt': _createdAt.toIso8601String(),
   };
   TicketSet.fromJson(Map<String, dynamic> json)
-    : _tickets = json['tickets'],
+    : _tickets = json['tickets'].map((ticket) => ticket.cast<int>()).toList().cast<List<int>>(),
       _coverage5thPrize = json['coverage5thPrize'],
       _coverage4thPrize = json['coverage4thPrize'],
+      _coverage3thPrize = json['coverage3thPrize'],
+      _coverage2thPrize = json['coverage2thPrize'],
+      _coverage1thPrize = json['coverage1thPrize'],
       _createdAt = DateTime.parse(json['createdAt']);
 
   static TicketSet random(int count) {
@@ -92,7 +104,7 @@ class TicketSet {
           .trim()
           .split(" ")
           .map(int.parse)
-          .toList())
+          .toList().cast<int>())
       .toList();
     for(int i=0; i<count; ++i) {
         for(int j=0; j<K; ++j) 
@@ -102,8 +114,10 @@ class TicketSet {
     return TicketSet(tickets);
   }
   Future<int> calculateCoverage() async {
+    _coverage1thPrize = await compute(coverageN_6_6, _tickets);
+    _coverage3thPrize = await compute(coverageN_6_5,  _tickets);
+    _coverage2thPrize = _coverage3thPrize;
     _coverage4thPrize = await compute(coverageN_6_4,  _tickets);
-    //_coverage4thPrize = 0;
     _coverage5thPrize = await compute(coverage5thPrizeD,  _tickets);
     return _coverage5thPrize;
   }
@@ -125,6 +139,20 @@ List<List<int>> combinations(int n, int r, {int i=0, int t=0, List<List<int>> re
     return res;
 }
 
+int coverageN_6_6(List<List<int>> tickets) {
+  final covered = <int, int>{};
+  int n, y, key, covered_count = 0;
+  for(n=0; n<tickets.length; ++n){
+    key = 0;
+    for(y=0; y<6; ++y)
+      key = key*(N+1) + (tickets[n][y]-1);
+    if(!covered.containsKey(key)){
+      covered_count += 1;
+      covered[key] = 1;
+    }
+  }
+  return covered_count;
+}
 int coverageN_6_4(List<List<int>> tickets) {
   final nCr = combinations(6, 4);
   final covered = <int, int>{};
@@ -140,6 +168,34 @@ int coverageN_6_4(List<List<int>> tickets) {
           if(e == a || e == b || e == c || e == d ||
             f == a || f == b || f == c || f == d)
             continue;
+          temp[0] = a; temp[1] = b; temp[2] = c; temp[3] = d;
+          temp[4] = e; temp[5] = f;
+          temp.sort();
+          key=0;
+          for(y=0; y<6; ++y)
+            key = key*N + (temp[y]-1);
+          if(!covered.containsKey(key)){
+            covered_count += 1;
+            covered[key] = 1;
+          }
+        }
+    }
+  }
+  return covered_count;
+}
+int coverageN_6_5(List<List<int>> tickets) {
+  final nCr = combinations(6, 5);
+  final covered = <int, int>{};
+  int n, a,b,c,d,e,f, x,y,key,covered_count=0;
+  List<int> ticket;
+  List<int> temp = [0,0,0,0,0,0];
+  for(n=0; n<tickets.length; ++n){
+    ticket = tickets[n];
+    for(x=0; x<nCr.length; ++x){
+      a = ticket[nCr[x][0]]; b = ticket[nCr[x][1]]; c = ticket[nCr[x][2]]; d = ticket[nCr[x][3]]; e = ticket[nCr[x][4]];
+      for(f=1; f<=45; ++f){
+        if(f == a || f == b || f == c || f == d || f == e)
+          continue;
           temp[0] = a; temp[1] = b; temp[2] = c; temp[3] = d;
           temp[4] = e; temp[5] = f;
           temp.sort();
