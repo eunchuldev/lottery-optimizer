@@ -1,16 +1,25 @@
-# lottery_optimizer
+# 로또번호 최적화
 
-A new Flutter project.
+# 개인정보 처리방침
 
-## Getting Started
+1. 수집하는 개인정보 항목 및 수집방법
 
-This project is a starting point for a Flutter application.
+로또번호 최적화 앱은 회원 가입 및 개인정보 제공 없이 사용이 가능합니다.   
+따라서 별도의 서버에 사용자 정보를 저장하지 않습니다.  
 
-A few resources to get you started if this is your first Flutter project:
+하지만, 광고가 포함된 경우 광고 플랫폼에서 광고 표시를 위해 이를 수집할 수 있으며, 이에 대한 절차 및 책임은 각 광고 플랫폼 제공처에 있습니다.  
+- 애드몹 (http://www.google.co.kr/admob)  
+- 애드핏 (http://adfitinfo.biz.daum.net)  
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+안드로이드 광고 ID 에 관한 정보 및 설정은 링크 사이트에서 확인할 수 있습니다.  
+(https://support.google.com/googleplay/android-developer/answer/6048248?hl=ko)  
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. 기타
+
+앱에 포함된 광고 플랫폼에서 개인정보를 수집하는 행위에 대해서는 "로또번호 최적화 개인정보취급방침"이 적용되지 않습니다.
+
+3. 연락처
+
+앱 사용중에 개인정보 관련 문의 사항은 아래의 연락처로 문의주시기 바랍니다.
+
+eunchul.dev@gmail.com
