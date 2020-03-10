@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/intl.dart';
 import 'LotteryBall.dart';
-import 'LotteryBall.dart';
-import 'LotteryBall.dart';
-import 'LotteryBall.dart';
 import 'state.dart';
 
 class Favorites extends StatefulWidget {
@@ -27,39 +24,48 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
     int round = LotteryNumberLoader.round;
 
     return ScopedModelDescendant<AppState>(
-      builder: (context, child, model) =>
-          ListView.separated(
-            physics: const BouncingScrollPhysics(),
-            itemCount: model.favorites.length,
-            itemBuilder: (context, index) => ListTile(
-                leading: Text("${DateFormat('MM월 dd일').format(model.favorites[index].createdAt)}"),
+      builder: (context, child, model) {
+        for(TicketSet ticket in model.favorites){
+          ticket.calculatePrize();
+        }
+        SizedBox loadingBox = SizedBox(
+          width: 20, height: 20,
+          child: CircularProgressIndicator(),
+        );
+        return ListView.separated(
+          physics: const BouncingScrollPhysics(),
+          itemCount: model.favorites.length,
+
+          itemBuilder: (context, index){
+            TicketSet ticket = model.favorites[index];
+            return ListTile(
+                leading: Text("${DateFormat('MM월 dd일').format(ticket.createdAt)}"),
                 title: GestureDetector(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: model.favorites[index].tickets[0].map((number) =>
+                        children: ticket.tickets[0].map((number) =>
                             LotteryBall().make(number),
                         )?.toList() ?? [],
                       ),
                       LotteryNumberLoader.getLastRound(model.favorites[index].createdAt)>round?
-                      model.favorites[index].coverage5thPrize == null?
-                      SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(),
-                      )
-                          : Text("${(model.favorites[index].coverage5thPrize*100/8145060).toStringAsFixed(1)}%")
-                          :Text("몇등")
+                      ticket.coverage5thPrize == null?
+                      loadingBox
+                          :Text("${(ticket.coverage5thPrize*100/8145060).toStringAsFixed(1)}%")
+                          :ticket.prize==0?loadingBox:Text(ticket.prize == 6?"꽝":ticket.prize.toString()+"등")
                     ],
                   ),
                   onTap: ()=>{
                     Navigator.push(context, MaterialPageRoute(builder:(context)=>LotteryList(tickets: model.favorites[index])))
                   },
                 )
-            ),
-            separatorBuilder: (context, index) => Divider(),
-          ),
+            );
+          },
+          separatorBuilder: (context, index) => Divider(),
+        );
+      }
     );
   }
 }

@@ -5,6 +5,7 @@ import 'state.dart';
 import 'tickets_generator.dart';
 import 'favorites.dart';
 import 'about.dart';
+import 'LotteryBall.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,6 +21,7 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    LotteryNumberLoader.Load();
     return ScopedModel<AppState>(
       model: model,
       child: MaterialApp(

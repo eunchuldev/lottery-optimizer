@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'LotteryBall.dart';
-import 'LotteryBall.dart';
 
 class WinningNumbers extends StatefulWidget {
   @override

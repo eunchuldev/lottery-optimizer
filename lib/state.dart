@@ -1,3 +1,4 @@
+import 'package:lottery_optimizer/LotteryBall.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -54,6 +55,7 @@ class TicketSet {
   int _coverage2thPrize;
   int _coverage1thPrize;
   DateTime _createdAt = DateTime.now();
+  int _prize = 0;
 
   List<List<int>> get tickets => _tickets;
   int get coverage5thPrize => _coverage5thPrize;
@@ -62,6 +64,7 @@ class TicketSet {
   int get coverage2thPrize => _coverage2thPrize;
   int get coverage1thPrize => _coverage1thPrize;
   DateTime get createdAt => _createdAt;
+  int get prize => _prize;
   TicketSet(this._tickets);
   TicketSet.empty();
 
@@ -73,6 +76,7 @@ class TicketSet {
     'coverage2thPrize': _coverage2thPrize,
     'coverage1thPrize': _coverage1thPrize,
     'createdAt': _createdAt.toIso8601String(),
+    'prize':_prize
   };
   TicketSet.fromJson(Map<String, dynamic> json)
     : _tickets = json['tickets'].map((ticket) => ticket.cast<int>()).toList().cast<List<int>>(),
@@ -81,7 +85,8 @@ class TicketSet {
       _coverage3thPrize = json['coverage3thPrize'],
       _coverage2thPrize = json['coverage2thPrize'],
       _coverage1thPrize = json['coverage1thPrize'],
-      _createdAt = DateTime.parse(json['createdAt']);
+      _createdAt = DateTime.parse(json['createdAt']),
+      _prize = json['prize'];
 
   static TicketSet random(int count) {
     List<List<int>> tickets = List.generate(count, (_) {
@@ -120,6 +125,35 @@ class TicketSet {
     _coverage4thPrize = await compute(coverageN_6_4,  _tickets);
     _coverage5thPrize = await compute(coverage5thPrizeD,  _tickets);
     return _coverage5thPrize;
+  }
+  void calculatePrize() async {
+    int last = LotteryNumberLoader.round;
+    int to = LotteryNumberLoader.getLastRound(_createdAt);
+    if(to > last){
+      _prize = 0;
+    }
+    LotterySet set = LotteryNumberLoader.list[to];
+
+    int maxPrize = 0;
+    for(List<int> list in _tickets){
+      int sames = 0;
+      for(int i in list){
+        if(set.numbers.contains(i))
+          sames++;
+      }
+      if(sames < 3)
+        _prize = 6;
+      else if(sames==3)
+        _prize = 5;
+      else if(sames==4)
+        _prize = 4;
+      else if(sames==5)
+        _prize = 3;
+      else if(sames==5 && list.contains(set.bonus))
+        _prize = 2;
+      else if(sames == 6)
+        _prize = 1;
+    }
   }
 }
 

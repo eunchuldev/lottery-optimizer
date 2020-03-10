@@ -34,6 +34,31 @@ class LotteryBall{
         ],
       );
 
+  Widget makeColorBall(int number, Color color) =>
+      Stack(
+        alignment: Alignment.center,
+        children:[
+          Container(
+            padding: EdgeInsets.all(18.0),
+            decoration: new BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 2.0,
+                  offset: Offset(
+                    1.0,
+                    2.0,
+                  ),
+                )
+              ],
+            ),
+          ),
+          Text("$number", style:TextStyle(color: Colors.white)),
+        ],
+      );
+
   Widget makeWithCheck(int number, LotterySet list) =>
       list.numbers.contains(number)?
           make(number):
@@ -43,7 +68,7 @@ class LotteryBall{
           Container(
             padding: EdgeInsets.all(18.0),
             decoration: new BoxDecoration(
-              color: Colors.grey,
+              color: list.bonus == number ? Colors.purple:Colors.grey,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -72,7 +97,7 @@ class LotteryBall{
           )?.toList() ?? [],
         ),
         Icon(Icons.add),
-        LotteryBall().make(list.bonus)
+        makeColorBall(list.bonus, Colors.purple)
       ],
     );
   }
