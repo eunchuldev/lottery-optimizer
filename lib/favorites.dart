@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/intl.dart';
+import 'LotteryBall.dart';
+import 'LotteryBall.dart';
+import 'LotteryBall.dart';
+import 'LotteryBall.dart';
 import 'state.dart';
-import 'lotto.dart';
 
 class Favorites extends StatefulWidget {
   @override
@@ -20,6 +23,8 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    int round = LotteryNumberLoader.round;
+
     return ScopedModelDescendant<AppState>(
       builder: (context, child, model) =>
           ListView.separated(
@@ -37,12 +42,14 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
                             LotteryBall().make(number),
                         )?.toList() ?? [],
                       ),
+                      LotteryNumberLoader.getLastRound(model.favorites[index].createdAt)>round?
                       model.favorites[index].coverage5thPrize == null?
-                        SizedBox(
-                          width: 20, height: 20,
-                          child: CircularProgressIndicator(),
-                        )
-                        : Text("${(model.favorites[index].coverage5thPrize*100/8145060).toStringAsFixed(1)}%")
+                      SizedBox(
+                        width: 20, height: 20,
+                        child: CircularProgressIndicator(),
+                      )
+                          : Text("${(model.favorites[index].coverage5thPrize*100/8145060).toStringAsFixed(1)}%")
+                          :Text("몇등")
                     ],
                   ),
                   onTap: ()=>{
@@ -68,8 +75,57 @@ class LotteryList extends StatefulWidget {
 class _LotteryList extends State<LotteryList>{
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body:LotteryBall().ticketSetPannel(widget.tickets, 0)
-    );
+    int last = LotteryNumberLoader.round;
+    int to = LotteryNumberLoader.getLastRound(widget.tickets.createdAt);
+
+    if(last < to || last - LotteryNumberLoader.range > to){
+      return Scaffold(
+          appBar: AppBar(
+              title:Text("목록")
+          ),
+          body:Container(
+            child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.tickets.tickets.length,
+              itemBuilder: (context, index) => ListTile(
+                leading: Text("#${index+1}"),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: widget.tickets.tickets[index].map((number) =>
+                      LotteryBall().make(number),
+                  )?.toList() ?? [],
+                ),
+              ),
+              separatorBuilder: (context, index) => Divider(),
+            ),
+            key: ValueKey<int>(0),
+          )
+      );
+    }
+    else{
+      LotterySet list = LotteryNumberLoader.list[to];
+      return Scaffold(
+          appBar: AppBar(
+            title:LotteryBall().makeWinningNumber(list)
+          ),
+          body:Container(
+            child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.tickets.tickets.length,
+              itemBuilder: (context, index) => ListTile(
+                leading: Text("#${index+1}"),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: widget.tickets.tickets[index].map((number) =>
+                      LotteryBall().makeWithCheck(number, list),
+                  )?.toList() ?? [],
+                ),
+              ),
+              separatorBuilder: (context, index) => Divider(),
+            ),
+            key: ValueKey<int>(0),
+          )
+      );
+    }
   }
 }
