@@ -23,6 +23,7 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     int round = LotteryNumberLoader.round;
 
     return ScopedModelDescendant<AppState>(

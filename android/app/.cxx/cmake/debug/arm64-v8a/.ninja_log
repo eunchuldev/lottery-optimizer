@@ -1,0 +1,11 @@
+# ninja log v5
+0	27	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	3bc35a4027c3af2d
+28	40	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac
+1	41	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	3bc35a4027c3af2d
+42	69	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac
+3	59	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	3bc35a4027c3af2d
+59	103	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac
+0	29	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	3bc35a4027c3af2d
+29	55	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac
+1	13	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac
+0	12	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/arm64-v8a/libverify.so	217400869ecaaeac

@@ -1,74 +1,125 @@
 import 'package:flutter/material.dart';
-import 'bookmark.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:firebase_admob/firebase_admob.dart';
+import 'state.dart';
+import 'tickets_generator.dart';
+import 'favorites.dart';
+import 'about.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+
+class MyApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _MyApp();
+  }
+class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
+  final model = AppState();
+  final List<String> titleList = ["북마크", "로또번호 분산기", "안내"];
+  String title = "로또번호 분산기";
   @override
   Widget build(BuildContext context) {
-    bookmarks = List<LottoRecord>();
-
-    ///SAMPLE DATA
-    for(int i=0;i<3;i++){
-      LottoRecord sample = LottoRecord();
-      sample.year = 1234;
-      sample.month = 12;
-      sample.date = 11;
-
-      sample.reward = "X";
-      List<int> list = List();
-      list.add(1);
-      list.add(2);
-      list.add(3);
-      list.add(4);
-      list.add(5);
-      list.add(6);
-      sample.selected = list;
-      bookmarks.add(sample);
-    }
-
-    ///버튼 위젯
-    Color color=Theme.of(context).primaryColor;
-    Widget buttonView=Container(
-      color: Color.fromARGB(255, 26, 188, 156),
-      padding : const EdgeInsets.all(30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          RaisedButton(///즐겨찾기
-            //TODO onPressed: ,
-              child: Icon(Icons.star, color: color)
+    super.build(context);
+    return ScopedModel<AppState>(
+      model: model,
+      child: MaterialApp(
+        home: DefaultTabController(
+          length: 3,
+          initialIndex: 1,
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomPadding: false,
+            appBar: AppBar(
+              bottom: TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.star)),
+                  Tab(icon: Icon(Icons.grain)),
+                  Tab(icon: Icon(Icons.help)),
+                ],
+                onTap: (index) => setState(()=>title = titleList[index]),
+              ),
+              title: Text(title),
+              elevation: 0.0,
+            ),
+            body: TabBarView(
+              children: [
+                Favorites(),
+                TicketsGenerator(),
+                About(),
+              ],
+            ),
           ),
-
-          RaisedButton(///메인
-            //TODO onPressed: ,
-              child: Icon(Icons.looks_one, color: color)
+        ),
+        theme: ThemeData(
+          primarySwatch: MyColor,
+          splashFactory: InkRipple.splashFactory,
+          textTheme: TextTheme(
+            bodyText2: TextStyle(fontSize: 15.0)
           ),
-        ],
-      ),
-    );
-
-    Widget showMenu = Container(
-      padding : const EdgeInsets.all(10),
-      child: Bookmark(bookmarks: bookmarks,),
-      height: 10000000,
-    );
-
-    return MaterialApp(
-      title: 'Lotto Learning',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('로또번호 최적화'),
+          buttonTheme: ButtonThemeData(
+            buttonColor: Colors.grey[400],     //  <-- dark color
+            //textTheme: ButtonTextTheme.primary, //  <-- this auto selects the right color
+            shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
+            padding: EdgeInsets.all(9.0),
+          ),
         ),
-        body: ListView(
-          children: <Widget>[
-            buttonView,
-            showMenu
-          ],
-        ),
+        builder: (context, widget) => Padding( child: widget, padding: EdgeInsets.only(bottom: paddingBottom)),
       ),
     );
   }
 
-  List<LottoRecord> bookmarks;
+  double paddingBottom = 50.0;
+
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    //testDevices: ['MobileId'],
+    //nonPersonalizedAds: true,
+    childDirected: false,
+    designedForFamilies: false,
+    keywords: <String>['Lottery', 'Powerball', 'Gambling', 'Jackpot'],
+  );
+  static const appId = "ca-app-pub-1530298900964476~9756147235";
+  BannerAd _bannerAd;
+  BannerAd bannerAd() => BannerAd(
+    adUnitId: "ca-app-pub-1530298900964476/1758786454",
+    size: AdSize.smartBanner,
+    targetingInfo: targetingInfo,
+    listener: (MobileAdEvent event) {
+      if(event == MobileAdEvent.failedToLoad) {
+        setState(() {
+          paddingBottom = 0.0;
+        });
+      }
+    });
+
+  @override
+  void initState() {
+    super.initState();
+    /*FirebaseAdMob.instance.initialize(appId: appId);
+    _bannerAd = bannerAd()
+      ..load()
+      ..show(
+        anchorType: AnchorType.bottom,
+      );*/
+  }
+  @override
+  void dispose() {
+    _bannerAd.dispose();
+    super.dispose();
+  }
+  @override
+  bool get wantKeepAlive => true;
 }
+
+MaterialColor MyColor = MaterialColor(0xff00a180, 
+<int, Color> {
+  50:Color(0xff00a180),
+  100:Color(0xff00a180),
+  200:Color(0xff00a180),
+  300:Color(0xff00a180),
+  400:Color(0xff00a180),
+  500:Color(0xff00a180),
+  600:Color(0xff00a180),
+  700:Color(0xff00a180),
+  800:Color(0xff00a180),
+  900:Color(0xff00a180),
+});

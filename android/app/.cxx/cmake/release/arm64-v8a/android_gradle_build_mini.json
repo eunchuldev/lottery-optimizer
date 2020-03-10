@@ -1,0 +1,16 @@
+{
+  "buildFiles": [
+    "/home/song/Projects/lottery_optimizer/android/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/home/song/Android/Sdk/cmake/3.6.4111459/bin/cmake --build /home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/release/arm64-v8a --target clean"
+  ],
+  "libraries": {
+    "verify-Release-arm64-v8a": {
+      "artifactName": "verify",
+      "buildCommand": "/home/song/Android/Sdk/cmake/3.6.4111459/bin/cmake --build /home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/release/arm64-v8a --target verify",
+      "abi": "arm64-v8a",
+      "output": "/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/release/obj/arm64-v8a/libverify.so"
+    }
+  }
+}
