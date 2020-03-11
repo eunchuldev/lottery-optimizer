@@ -15,8 +15,11 @@ class MyApp extends StatefulWidget {
   }
 class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
   final model = AppState();
+  final List<String> titleList = ["북마크", "로또번호 분산기", "안내"];
+  String title = "로또번호 분산기";
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ScopedModel<AppState>(
       model: model,
       child: MaterialApp(
@@ -33,8 +36,9 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
                   Tab(icon: Icon(Icons.grain)),
                   Tab(icon: Icon(Icons.help)),
                 ],
+                onTap: (index) => setState(()=>title = titleList[index]),
               ),
-              title: Text("로또번호 최적화"),
+              title: Text(title),
               elevation: 0.0,
             ),
             body: TabBarView(
@@ -47,10 +51,10 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
           ),
         ),
         theme: ThemeData(
-          primarySwatch: Colors.teal,
+          primarySwatch: MyColor,
           splashFactory: InkRipple.splashFactory,
           textTheme: TextTheme(
-            body1: TextStyle(fontSize: 15.0)
+            bodyText2: TextStyle(fontSize: 15.0)
           ),
           buttonTheme: ButtonThemeData(
             buttonColor: Colors.grey[400],     //  <-- dark color
@@ -68,8 +72,10 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
 
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     //testDevices: ['MobileId'],
-    nonPersonalizedAds: true,
-    keywords: <String>['Game', 'Mario'],
+    //nonPersonalizedAds: true,
+    childDirected: false,
+    designedForFamilies: false,
+    keywords: <String>['Lottery', 'Powerball', 'Gambling', 'Jackpot'],
   );
   static const appId = "ca-app-pub-1530298900964476~9756147235";
   BannerAd _bannerAd;
@@ -87,11 +93,13 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
 
   @override
   void initState() {
-    FirebaseAdMob.instance.initialize(appId: appId);
+    super.initState();
+    /*FirebaseAdMob.instance.initialize(appId: appId);
     _bannerAd = bannerAd()
       ..load()
-      ..show();
-    super.initState();
+      ..show(
+        anchorType: AnchorType.bottom,
+      );*/
   }
   @override
   void dispose() {
@@ -101,3 +109,17 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
   @override
   bool get wantKeepAlive => true;
 }
+
+MaterialColor MyColor = MaterialColor(0xff00a180, 
+<int, Color> {
+  50:Color(0xff00a180),
+  100:Color(0xff00a180),
+  200:Color(0xff00a180),
+  300:Color(0xff00a180),
+  400:Color(0xff00a180),
+  500:Color(0xff00a180),
+  600:Color(0xff00a180),
+  700:Color(0xff00a180),
+  800:Color(0xff00a180),
+  900:Color(0xff00a180),
+});

@@ -1,5 +1,4 @@
 import 'dart:ffi';
-import 'dart:io';
 import 'package:ffi/ffi.dart';
 
 final DynamicLibrary dylib = DynamicLibrary.open('libverify.so');

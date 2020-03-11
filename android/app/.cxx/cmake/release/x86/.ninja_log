@@ -1,0 +1,4 @@
+# ninja log v5
+0	89	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	c49ded26c1b72cda
+89	99	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/release/obj/x86/libverify.so	16088006f177b161
+0	27	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/release/obj/x86/libverify.so	16088006f177b161

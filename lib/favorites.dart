@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/intl.dart';
 import 'state.dart';
+import 'package:http/http.dart' as http;
+
 
 class Favorites extends StatefulWidget {
   @override
@@ -19,6 +21,7 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    fetchWinningTicket();
     return ScopedModelDescendant<AppState>(
       builder: (context, child, model) => 
         ListView.separated(
@@ -42,5 +45,14 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
           separatorBuilder: (context, index) => Divider(),
         ),
     );
+  }
+}
+
+Future<void> fetchWinningTicket() async {
+  final res = await http.get("https://m.dhlottery.co.kr/gameResult.do?method=byWin");
+  for(int i=0, start=0, end=0; i<6; ++i) {
+    start = res.body.indexOf('ball clr', end);
+    end = res.body.indexOf('<', start);
+    print(res.body.substring(start + 11, end));
   }
 }

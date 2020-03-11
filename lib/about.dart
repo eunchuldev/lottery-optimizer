@@ -9,7 +9,7 @@ class About extends StatelessWidget {
   Widget topPannel(BuildContext context) =>
     Theme(
       data: Theme.of(context).copyWith(
-        textTheme: TextTheme(body1: TextStyle(color: Colors.white)),
+        textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
         ),
       child: Card(
         margin: EdgeInsets.zero,
@@ -17,7 +17,7 @@ class About extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
         child: Container(
           color: Theme.of(context).primaryColor,
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 48.0, bottom: 32.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -35,7 +35,7 @@ class About extends StatelessWidget {
   Widget middlePannel(BuildContext context) =>
     Theme(
       data: Theme.of(context).copyWith(
-        textTheme: TextTheme(body1: TextStyle(color: Colors.white)),
+        textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
         ),
       child: Card(
         margin: EdgeInsets.zero,
@@ -43,7 +43,7 @@ class About extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
         child: Container(
           color: Theme.of(context).primaryColor,
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 16.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 32.0, bottom: 32.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -59,7 +59,8 @@ class About extends StatelessWidget {
         )),
     );
 
-  final String about_markdown = """
+  final String aboutMarkdown = """
+----
 # 번호분포와 당첨확률
 
 로또번호를 더 잘 분포시키면 1등을 제외한 2~5등의 당첨확률을 높힐 수 있습니다.  
@@ -94,6 +95,24 @@ class About extends StatelessWidget {
 
 이렇듯 더 잘 분포된 로또번호는 무작위로 선정된 로또번호보다 당첨확률을 높혀줄수 있습니다.
 
+----
+----
+----
+# 당첨확률과 기댓값
+
+그러나 당첨확률이 높아진만큼 당첨금액 기댓값이 높아지는건 결코 아닙니다!
+
+극단적인 예로, 똑같은 번호를 100장을 산다고 상상해보세요.
+
+당첨확률은 극도로 낮아지겠지만, 당첨금액 기댓값은 그에 반비례해 높아질 것입니다.
+
+음, 사실 기댓값이 살짝 높아지기는 합니다. 고정된 상금을 받는 4등, 5등을 제외한 등수는 당첨자가 많을수록 상금이 줄어드니깐요.
+
+그러나 위 예시처럼 극단적인 전략(똑같은 번호, 혹은 거의 비슷한 번호 여러장 사기)과 비교하는게 아니라면 대비효과는 미비합니다.
+
+즉, 로또번호 분산기는 당첨확률을 높혀주고 안정적인 수익을 얻을 수 있게 도와주지만, 당첨금액 기댓값을 드라마틱하게 높혀주지는 않습니다.
+
+
 """;
 
   Widget build(BuildContext context) {
@@ -114,7 +133,7 @@ class About extends StatelessWidget {
                     padding: EdgeInsets.all(20.0),
                     child: Image.asset(uri.toString().replaceAll("resource:", "")),
                   ),
-                  data: about_markdown,
+                  data: aboutMarkdown,
                 ),
               ]
             ),
@@ -128,7 +147,7 @@ class About extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             child: Column( 
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: contacts.map((line) => Text(line, style:Theme.of(context).textTheme.headline)).toList(),
+              children: contacts.map((line) => Text(line, style:Theme.of(context).textTheme.headline5)).toList(),
             ),
           ),
         ],

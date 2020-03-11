@@ -27,9 +27,9 @@ class AppState extends Model {
   }
   _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var json_data = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
-    _favorites = json_data['favorites']?.map((ticket_json) => 
-      TicketSet.fromJson(ticket_json))?.toList().cast<TicketSet>() ?? [];
+    var jsonData = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
+    _favorites = jsonData['favorites']?.map((ticketJson) =>
+      TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -141,22 +141,22 @@ List<List<int>> combinations(int n, int r, {int i=0, int t=0, List<List<int>> re
 
 int coverageN_6_6(List<List<int>> tickets) {
   final covered = <int, int>{};
-  int n, y, key, covered_count = 0;
+  int n, y, key, coveredCount = 0;
   for(n=0; n<tickets.length; ++n){
     key = 0;
     for(y=0; y<6; ++y)
       key = key*(N+1) + (tickets[n][y]-1);
     if(!covered.containsKey(key)){
-      covered_count += 1;
+      coveredCount += 1;
       covered[key] = 1;
     }
   }
-  return covered_count;
+  return coveredCount;
 }
 int coverageN_6_4(List<List<int>> tickets) {
   final nCr = combinations(6, 4);
   final covered = <int, int>{};
-  int n, a,b,c,d,e,f, x,y,key,covered_count=0;
+  int n, a,b,c,d,e,f, x,y,key,coveredCount=0;
   List<int> ticket;
   List<int> temp = [0,0,0,0,0,0];
   for(n=0; n<tickets.length; ++n){
@@ -175,18 +175,18 @@ int coverageN_6_4(List<List<int>> tickets) {
           for(y=0; y<6; ++y)
             key = key*N + (temp[y]-1);
           if(!covered.containsKey(key)){
-            covered_count += 1;
+            coveredCount += 1;
             covered[key] = 1;
           }
         }
     }
   }
-  return covered_count;
+  return coveredCount;
 }
 int coverageN_6_5(List<List<int>> tickets) {
   final nCr = combinations(6, 5);
   final covered = <int, int>{};
-  int n, a,b,c,d,e,f, x,y,key,covered_count=0;
+  int n, a,b,c,d,e,f, x,y,key,coveredCount=0;
   List<int> ticket;
   List<int> temp = [0,0,0,0,0,0];
   for(n=0; n<tickets.length; ++n){
@@ -203,13 +203,13 @@ int coverageN_6_5(List<List<int>> tickets) {
           for(y=0; y<6; ++y)
             key = key*(N+1) + (temp[y]-1);
           if(!covered.containsKey(key)){
-            covered_count += 1;
+            coveredCount += 1;
             covered[key] = 1;
           }
         }
     }
   }
-  return covered_count;
+  return coveredCount;
 }
 
 int coverageN_6_3(List<List<int>> tickets) {
@@ -224,7 +224,7 @@ int coverageN_6_3(List<List<int>> tickets) {
                 key = key*N + (tickets[i][nCr[x][y]]-1); 
             covered[key] += 1;
         }
-    var covered_count = 0;
+    var coveredCount = 0;
     for(i=1; i<=N-K+1; ++i){
         for(j=i+1; j<=N-K+2; ++j){
             for(k=j+1; k<=N-K+3; ++k)
@@ -242,12 +242,12 @@ int coverageN_6_3(List<List<int>> tickets) {
                                 for(y=0; y<nCr[x].length; ++y)
                                     key = key*N + (ticket[nCr[x][y]]-1);
                                 if(covered[key] > 0){
-                                    covered_count += 1;
+                                    coveredCount += 1;
                                     break;
                                 }
                             }
                           }
       }
     }
-    return covered_count;
+    return coveredCount;
 }

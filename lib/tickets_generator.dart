@@ -4,6 +4,7 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'dart:math';
+import 'dart:core';
 import 'state.dart';
 
 
@@ -68,6 +69,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
     });
   }
   void manualFeedingEnd(model) {
+    Random rng = Random();
     setState(() {
       manualFeeding = false;
       if(_manualFeedingTextController.text == "")
@@ -78,6 +80,12 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
             .split("\n")
             .map((line)=>line.split(" ").map((str) => min(max(int.parse(str), 1), 45)).toList().cast<int>()..sort())
             .where((list) => list.length == 6)
+            .map((list) {
+              for(int i=0; i<list.length; ++i)
+                while(list.indexOf(list[i]) != i)
+                  list[i] = rng.nextInt(45)+ 1;
+              return list;
+            })
             .toList().cast<List<int>>()
         );
     });
@@ -116,7 +124,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       visible: !keyboardUp,
       child: Theme(
         data: Theme.of(context).copyWith(
-          textTheme: TextTheme(body1: TextStyle(color: Colors.white)),
+          textTheme: TextTheme(bodyText2: TextStyle(color: Colors.white)),
           ),
         child: Card(
           margin: EdgeInsets.zero,
@@ -129,8 +137,19 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
               shrinkWrap: true,
               children: [
                 ListTile(
-                  title: Text("로또번호 갯수", style: topPannelTextStyle()),
-                  trailing: ticketsNumField(),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("로또번호 갯수", style: topPannelTextStyle()),
+                      Expanded(child:
+                        Padding( 
+                          padding: EdgeInsets.all(16.0),
+                          child: Divider(
+                            color: Color(0x55ffffff),
+                          ))),
+                      ticketsNumField(),
+                    ],
+                  ),
                 ),
                 ListTile(
                   title: Row(
@@ -139,6 +158,8 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                         child: ScopedModelDescendant<AppState>(
                           builder: (context, child, model) => RaisedButton(
                             child: Text("랜덤생성", style: topPannelTextStyle()),
+                              elevation: 0.0,
+                            color: Colors.grey[400],
                             onPressed: () => generateRandomTicketSet(model),
                             shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
                           ),
@@ -148,6 +169,8 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                       Expanded( child: Padding(
                         child: RaisedButton(
                           child: Text("직접입력", style: topPannelTextStyle()),
+                          elevation: 0.0,
+                          color: Colors.grey[400],
                           onPressed: () => manualFeedingStart(),
                           shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
                         ),
@@ -161,8 +184,9 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                     ScopedModelDescendant<AppState>(
                       builder: (context, child, model) => RaisedButton(
                         child: Text("최적화 로또번호세트 생성", style: topPannelTextStyle()),
-                        onPressed: () async => await generateOptimizedTicketSet(model),
-                        color: Colors.orange,
+                        elevation: 0.0,
+                        onPressed: () => generateOptimizedTicketSet(model),
+                        color: Colors.orange[700],
                         textColor: Colors.white,
                         shape: RoundedRectangleBorder( borderRadius: new BorderRadius.circular(8.0),),
                       ),),
@@ -172,7 +196,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
           )),
       )
     );
-  Widget LotteryBall(int number) => 
+  Widget lotteryBall(int number) =>
     Stack(
       alignment: Alignment.center,
       children:[
@@ -217,10 +241,10 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                 hintText: "번호를 직접 입력해보세요. ex) 1 3 7 13 24 31", 
                 contentPadding: const EdgeInsets.all(12.0),
               ),
-              inputFormatters: [WhitelistingTextInputFormatter(RegExp(r'[\d\s]+')), LotteryBallTextFormatter()], 
+              inputFormatters: [WhitelistingTextInputFormatter(RegExp(r'[\d\s]+')), LotteryBallTextFormatter()],
               controller: _manualFeedingTextController,
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.done,
               maxLines: null,
               onTap: () {
                 setState(() => keyboardUp = true);
@@ -233,7 +257,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
         : ticketSet == null? 
         Center(child:Padding(
           padding: EdgeInsets.all(20.0),
-          child: Text("위 버튼을 클릭해 번호를 생성해보세요.", style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.5)),
+          child: Text("아직 생성된 번호가 없어요...", style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.2, color: Colors.grey)),
         )):
         ListView.separated(
           physics: const BouncingScrollPhysics(), 
@@ -245,7 +269,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: ticketSet?.tickets[index].map((number) =>
-                  LotteryBall(number),
+                  lotteryBall(number),
                 )?.toList() ?? [],
               ),
             ),
@@ -293,26 +317,93 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                       ],
                     ) :
                     statsExpanded? 
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical:4.0),
-                            child:Text("1등: ${ticketSet.coverage1thPrize} / ${8145060} (${((ticketSet.coverage1thPrize ?? 0)*100/8145060).toStringAsFixed(4)}%)")), 
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical:4.0),
-                            child:Text("2등: ${ticketSet.coverage2thPrize} / ${8145060*45} (${((ticketSet.coverage3thPrize ?? 0)*100/8145060/45).toStringAsFixed(3)}%)")), 
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical:4.0),
-                            child:Text("3등: ${ticketSet.coverage3thPrize} / 8145060 (${((ticketSet.coverage3thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical:4.0),
-                            child:Text("4등: ${ticketSet.coverage4thPrize} / 8145060 (${((ticketSet.coverage4thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical:4.0),
-                            child:Text("5등: ${ticketSet.coverage5thPrize} / 8145060 (${((ticketSet.coverage5thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%)")), 
-                        ],
-                      )
+                      Expanded(
+                        child: DefaultTextStyle(
+                          style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 0.8),//, color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("등수"))),
+                                      Expanded(child:Center(child:Text("커버된수"))),
+                                      Expanded(child:Center(child:Text("경우의수"))),
+                                      Expanded(child:Center(child:Text("커버리지"))),
+                                    ],
+                              ))),
+                              Divider(),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("1등"))),
+                                      Expanded(child:Center(child:Text("${ticketSet.coverage1thPrize}"))),
+                                      Expanded(child:Center(child:Text("${8145060}"))),
+                                      Expanded(child:Center(child:Text("${((ticketSet.coverage1thPrize ?? 0)*100/8145060).toStringAsFixed(4)}%"))),
+                                    ],
+                              ))),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("2등"))),
+                                      Expanded(child:Center(child:Text("${ticketSet.coverage2thPrize}"))),
+                                      Expanded(child:Center(child:Text("${8145060*45}"))),
+                                      Expanded(child:Center(child:Text("${((ticketSet.coverage2thPrize ?? 0)*100/8145060).toStringAsFixed(3)}%"))),
+                                    ],
+                              ))),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("3등"))),
+                                      Expanded(child:Center(child:Text("${ticketSet.coverage3thPrize}"))),
+                                      Expanded(child:Center(child:Text("${8145060}"))),
+                                      Expanded(child:Center(child:Text("${((ticketSet.coverage3thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%"))),
+                                    ],
+                              ))),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("4등"))),
+                                      Expanded(child:Center(child:Text("${ticketSet.coverage4thPrize}"))),
+                                      Expanded(child:Center(child:Text("${8145060}"))),
+                                      Expanded(child:Center(child:Text("${((ticketSet.coverage4thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%"))),
+                                    ],
+                              ))),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical:4.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child:Center(child:Text("5등"))),
+                                      Expanded(child:Center(child:Text("${ticketSet.coverage5thPrize}"))),
+                                      Expanded(child:Center(child:Text("${8145060}"))),
+                                      Expanded(child:Center(child:Text("${((ticketSet.coverage5thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%"))),
+                                    ],
+                              ))),
+                            ],
+                          )))
                       : Row(
                         children: [
                           Text("${((ticketSet.coverage5thPrize ?? 0)*100/8145060).toStringAsFixed(2)}%로 5등 당첨"), 
@@ -427,5 +518,12 @@ class LotteryBallTextFormatter extends TextInputFormatter {
         selection: TextSelection.collapsed(offset: min(newValue.selection.end, formatted.length),),
         );
     }
+  }
+}
+
+extension IndexedIterable<E> on Iterable<E> {
+  Iterable<T> mapIndexed<T>(T f(E e, int i)) {
+    var i = 0;
+    return this.map((e) => f(e, i++));
   }
 }
