@@ -9,3 +9,5 @@
 25	53	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so	e62b43bd261e4d23
 1	9	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so	e62b43bd261e4d23
 0	10	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so	e62b43bd261e4d23
+0	20	0	CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o	b0dcb2a673507c5c
+20	43	0	/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so	e62b43bd261e4d23

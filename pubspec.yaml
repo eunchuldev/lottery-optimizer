@@ -32,6 +32,7 @@ dependencies:
   keyboard_visibility: 0.5.5
   http: ^0.12.0+4
   toast: ^0.1.3
+  html: ^0.14.0+3
 
 dev_dependencies:
   flutter_test:

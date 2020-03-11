@@ -1,1 +1,9 @@
-[1/1] Linking C shared library /home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so
+[1/2] Building C object CMakeFiles/verify.dir/home/song/Projects/lottery_optimizer/lib/verify.c.o
+/home/song/Projects/lottery_optimizer/lib/verify.c:70:35: warning: incompatible pointer types passing 'int [1][6]' to parameter of type 'int *' [-Wincompatible-pointer-types]
+  printf("%d\n", coverage5thPrize(tickets, 1));
+                                  ^~~~~~~
+/home/song/Projects/lottery_optimizer/lib/verify.c:5:33: note: passing argument to parameter 'tickets' here
+extern int coverage5thPrize(int tickets[], int ticket_num) {
+                                ^
+1 warning generated.
+[2/2] Linking C shared library /home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/debug/obj/x86_64/libverify.so
