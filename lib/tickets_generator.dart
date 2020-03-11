@@ -16,7 +16,6 @@ class TicketsGenerator extends StatefulWidget {
 class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveClientMixin<TicketsGenerator>, SingleTickerProviderStateMixin  {
   TicketSet ticketSet;
   int ticketsNum = 50;
-  bool favorite = false;
   bool calculating = false;
   bool manualFeeding = false;
   bool keyboardUp = false;
@@ -30,14 +29,14 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   void generateRandomTicketSet(AppState model) {
     setState(() {
       ticketSet = TicketSet.random(ticketsNum);
-      favorite = false;
+      model.isFavorite = false;
       _count += 1;
     });
     calculateCoverage(model);
   }
   void generateOptimizedTicketSet(AppState model) {
     setState(() {
-      favorite = false;
+      model.isFavorite = false;
       _count += 1;
     });
     TicketSet.optimized(ticketsNum).then((_ticketsSet) {
@@ -421,26 +420,20 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
                         builder: (context, child, model) => 
                         InkWell(
                           onTap: () {
-                            if(!favorite){
+                            if(!model.isFavorite){
                               model.favorite(ticketSet);
-                              setState(() {
-                                favorite = true;
-                              });
                             }
                             else{
                               model.unfavoriteLast();
-                              setState(() {
-                                favorite = false;
-                              });
                             }
                           },
                           customBorder: CircleBorder(),
                           child: Container(
                             padding: EdgeInsets.all(8.0),
                             child: Icon(
-                              favorite? Icons.star : Icons.star_border, 
+                              model.isFavorite? Icons.star : Icons.star_border,
                               size: 30.0,
-                              color: favorite? Colors.yellow[700] : Colors.black,
+                              color: model.isFavorite? Colors.yellow[700] : Colors.black,
                               semanticLabel: '즐겨찾기',
                             ),
                           ),

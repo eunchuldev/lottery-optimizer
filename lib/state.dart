@@ -10,13 +10,23 @@ import 'native.dart';
 
 class AppState extends Model {
   List<TicketSet> _favorites = [];
+  bool isFavorite;
   void favorite(TicketSet ticketSet) {
     _favorites.insert(0, ticketSet);
+    isFavorite = true;
+    notifyListeners();
+    _save();
+  }
+  void unfavorite(int index){
+    _favorites.removeAt(index);
+    if(index == 0)
+      isFavorite = false;
     notifyListeners();
     _save();
   }
   void unfavoriteLast() {
     _favorites.removeAt(0);
+    isFavorite = false;
     notifyListeners();
     _save();
   }
