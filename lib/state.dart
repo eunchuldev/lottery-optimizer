@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'dart:math';
 import 'native.dart';
 
-
 class AppState extends Model {
   List<TicketSet> _favorites = [];
   bool isFavorite;
@@ -30,17 +29,31 @@ class AppState extends Model {
     notifyListeners();
     _save();
   }
+  void winningNumberUpdated(){
+    notifyListeners();
+    _save();
+  }
   void coverageUpdated() {
+    notifyListeners();
+  }
+  void prizeUpdated(){
     notifyListeners();
   }
   List<TicketSet> get favorites {
     return List.from(_favorites);
+  }
+  List<LotterySet> get winningNumbers{
+    return List.from(LotteryNumberLoader.list);
   }
   _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var jsonData = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
     _favorites = jsonData['favorites']?.map((ticketJson) =>
       TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
+    LotteryNumberLoader.list = jsonData['winnings']?.map((winningJson)=>
+      LotterySet.fromJson(winningJson))?.toList()?.cast<LotterySet>()??[];
+    LotteryNumberLoader.from = jsonData['winningsFrom'];
+    LotteryNumberLoader.round = jsonData['winningsTo'];
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -48,6 +61,9 @@ class AppState extends Model {
   }
   Map<String, dynamic> toJson() => {
     'favorites': favorites.map((ticketSet)=>ticketSet.toJson()).toList(),
+    'winnings' : winningNumbers.map((lotterySet) =>lotterySet?.toJson()).toList(),
+    'winningsFrom':LotteryNumberLoader.from,
+    'winningsTo':LotteryNumberLoader.round
   };
   AppState() {
     _load();
@@ -134,38 +150,51 @@ class TicketSet {
     _coverage2thPrize = _coverage3thPrize;
     _coverage4thPrize = await compute(coverageN_6_4,  _tickets);
     _coverage5thPrize = await compute(coverage5thPrizeD,  _tickets);
+    calculatePrize();
     return _coverage5thPrize;
   }
-  void calculatePrize() async {
-    int last = LotteryNumberLoader.round;
-    int to = LotteryNumberLoader.getLastRound(_createdAt);
-    if(to > last){
-      _prize = 0;
-      return;
-    }
-    LotterySet set = LotteryNumberLoader.list[to];
-
-    int maxPrize = 0;
-    for(List<int> list in _tickets){
-      int sames = 0;
-      for(int i in list){
-        if(set.numbers.contains(i))
-          sames++;
-      }
-      if(sames < 3)
-        _prize = 6;
-      else if(sames==3)
-        _prize = 5;
-      else if(sames==4)
-        _prize = 4;
-      else if(sames==5)
-        _prize = 3;
-      else if(sames==5 && list.contains(set.bonus))
-        _prize = 2;
-      else if(sames == 6)
-        _prize = 1;
-    }
+  void calculatePrize() async{
+    _prize = getPrize(this);
   }
+}
+
+int getPrize(TicketSet tickets){
+  DateTime createdAt = tickets.createdAt;
+
+  int last = LotteryNumberLoader.round;
+  int to = LotteryNumberLoader.getLastRound(createdAt);
+  if(to > last){
+    return 0;
+  }
+
+  LotterySet set = LotteryNumberLoader.list[to];
+  if(set == null)
+    return 0;
+
+  int maxPrize = 6;
+  for(List<int> list in tickets.tickets){
+    int sames = 0;
+    for(int i in list){
+      if(set.numbers.contains(i))
+        sames++;
+    }
+    int prize = 6;
+    if(sames < 3)
+      prize = 6;
+    else if(sames==3)
+      prize = 5;
+    else if(sames==4)
+      prize = 4;
+    else if(sames==5)
+      prize = 3;
+    else if(sames==5 && list.contains(set.bonus))
+      prize = 2;
+    else if(sames == 6)
+      prize = 1;
+    if(maxPrize > prize)
+      maxPrize = prize;
+  }
+  return maxPrize;
 }
 
 List<List<int>> combinations(int n, int r, {int i=0, int t=0, List<List<int>> res, List<int> ticket}) {

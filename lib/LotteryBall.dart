@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
-import 'state.dart';
+import 'package:lottery_optimizer/state.dart';
 
 class LotteryBall{
   Widget make(int number) =>
@@ -106,42 +106,53 @@ class LotteryBall{
 class LotterySet{
   List<int> numbers;
   int bonus;
+
+  LotterySet();
+
+  LotterySet.fromJson(Map<String, dynamic> json)
+      : numbers = json['tickets'].map((ticket) => ticket.cast<int>()).toList(),
+        bonus = json['bonus'];
+
+  Map<String, dynamic> toJson() => {
+    'tickets': numbers,
+    'bonus': bonus,
+  };
 }
 
 class LotteryNumberLoader{
-  static List<LotterySet> list;
+  static List<LotterySet> list = List(99999);
+
+  static int from = 0;
   static int round = 0;
-  static int completed = 0;
-  static int range = 20;
 
   static int getRound(){
     return round;
   }
 
-  static void _updateDay(){
-    DateTime time = DateTime.now();
-    DateTime from = DateTime(2020,3,7,8,39);
-    round = (time.millisecondsSinceEpoch - from.millisecondsSinceEpoch)~/(1000*60*60*24*7) + 901;
-  }
-
   static int getLastRound(DateTime time){
-    _updateDay();
     DateTime day = DateTime(time.year,time.month,time.day+7);
     DateTime from = DateTime(2020,3,7,8,41);
     int round = (day.millisecondsSinceEpoch - from.millisecondsSinceEpoch)~/(1000*60*60*24*7) + 901;
     return round;
   }
 
-  static void Load() async{
-    _updateDay();
+  static Load(AppState app) async{
+    int now = getLastRound(DateTime.now()) - 1;
+    int until;
+    if(now == round)
+      return;
 
-    list = List<LotterySet>(round+1);
-    completed = 0;
+    if(round == 0)
+      until = now - 20;
+    else
+      until = round;
 
-    for(int i=round;i>=round-range;i--){
+    round = now;
+    from = until;
+
+    for(int i=now; i>until; i--){
       http.Response response = await http.get("https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo="+i.toString());
       if(response.statusCode != 200){
-        round = 0;
         return;
       }
       dom.Document document = parser.parse(response.body);
@@ -181,7 +192,7 @@ class LotteryNumberLoader{
       });
 
       list[i] = balls;
-      completed++;
     }
+    app.winningNumberUpdated();
   }
 }

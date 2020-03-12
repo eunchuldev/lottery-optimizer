@@ -49,6 +49,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
   void calculateCoverage(AppState model) {
       setState(() {
         calculating = true;
+        ticketSet = ticketSet;
       });
       ticketSet.calculateCoverage().then((res) {
         setState(() {

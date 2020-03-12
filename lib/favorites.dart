@@ -37,12 +37,19 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
       body: ScopedModelDescendant<AppState>(
           builder: (context, child, model) {
             for(TicketSet ticket in model.favorites){
+              if(ticket.prize != 0)
+                break;
               ticket.calculatePrize();
+              model.prizeUpdated();
             }
+            LotteryNumberLoader.Load(model);
+            model.winningNumberUpdated();
+
             SizedBox loadingBox = SizedBox(
               width: 20, height: 20,
               child: CircularProgressIndicator(),
             );
+
             return ListView.separated(
               physics: const BouncingScrollPhysics(),
               itemCount: model.favorites.length,
@@ -64,7 +71,7 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
                         )?.toList() ?? [],
                       ),
                       ticket.coverage5thPrize == null? loadingBox :
-                          Row(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
                               Text("${(ticket.coverage5thPrize*100/8145060).toStringAsFixed(1)}%"),
@@ -106,7 +113,8 @@ class _LotteryList extends State<LotteryList>{
     int last = LotteryNumberLoader.round;
     int to = LotteryNumberLoader.getLastRound(widget.tickets.createdAt);
 
-    if(last < to || last - LotteryNumberLoader.range > to){
+    LotterySet list = LotteryNumberLoader.list[to];
+    if(last < to || last - LotteryNumberLoader.from > to || list == null){
       return Scaffold(
           appBar: AppBar(
               title:Text("목록")
@@ -131,10 +139,9 @@ class _LotteryList extends State<LotteryList>{
       );
     }
     else{
-      LotterySet list = LotteryNumberLoader.list[to];
       return Scaffold(
           appBar: AppBar(
-              title:LotteryBall().makeWinningNumber(list)
+              title:LotteryBall().makeWinningNumber(list),
           ),
           body:Container(
             child: ListView.separated(
