@@ -6,7 +6,7 @@ import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'dart:math';
 import 'dart:core';
 import 'state.dart';
-
+import 'LotteryBall.dart';
 
 class TicketsGenerator extends StatefulWidget {
   @override
@@ -197,33 +197,7 @@ class _TicketsGenerator extends State<TicketsGenerator> with AutomaticKeepAliveC
       )
     );
   Widget lotteryBall(int number) =>
-    Stack(
-      alignment: Alignment.center,
-      children:[
-        Container(
-          padding: EdgeInsets.all(18.0),
-          decoration: new BoxDecoration(
-            color: (number >= 40)? Colors.green : 
-                   (number >= 30)? Colors.grey :
-                   (number >= 20)? Colors.red :
-                   (number >= 10)? Colors.blue :
-                                   Colors.orange,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 2.0, 
-                offset: Offset(
-                  1.0, 
-                  2.0, 
-                ),
-              )
-            ],
-          ),
-        ),
-        Text("$number", style:TextStyle(color: Colors.white)),
-      ],
-    );
+    LotteryBall().make(number);
 
   Widget ticketSetPannel() => 
     Container(

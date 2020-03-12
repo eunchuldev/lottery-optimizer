@@ -13,7 +13,7 @@ class LotteryBall{
             padding: EdgeInsets.all(18.0),
             decoration: new BoxDecoration(
               color: (number >= 40)? Colors.green :
-              (number >= 30)? Colors.grey :
+              (number >= 30)? Colors.cyan :
               (number >= 20)? Colors.red :
               (number >= 10)? Colors.blue :
               Colors.orange,
@@ -138,10 +138,10 @@ class LotteryNumberLoader{
 
   static Load(AppState app) async{
     int now = getLastRound(DateTime.now()) - 1;
-    int until;
     if(now == round)
       return;
 
+    int until;
     if(round == 0)
       until = now - 20;
     else
@@ -151,10 +151,11 @@ class LotteryNumberLoader{
     if(from == 0)
       from = until;
 
-    for(int i=now; i>until; i--){
+    for(int i=until + 1; i<now; i++){
       http.Response response = await http.get("https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo="+i.toString());
       if(response.statusCode != 200){
-        return;
+        round = i - 1;
+        break;
       }
       dom.Document document = parser.parse(response.body);
       LotterySet balls = new LotterySet();
