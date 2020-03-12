@@ -148,7 +148,8 @@ class LotteryNumberLoader{
       until = round;
 
     round = now;
-    from = until;
+    if(from == 0)
+      from = until;
 
     for(int i=now; i>until; i--){
       http.Response response = await http.get("https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo="+i.toString());
