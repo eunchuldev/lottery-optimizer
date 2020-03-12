@@ -141,6 +141,7 @@ class TicketSet {
     int to = LotteryNumberLoader.getLastRound(_createdAt);
     if(to > last){
       _prize = 0;
+      return;
     }
     LotterySet set = LotteryNumberLoader.list[to];
 
