@@ -36,14 +36,8 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
       ),),
       body: ScopedModelDescendant<AppState>(
           builder: (context, child, model) {
-            for(TicketSet ticket in model.favorites){
-              if(ticket.prize != 0)
-                break;
-              ticket.calculatePrize();
-              model.prizeUpdated();
-            }
-            LotteryNumberLoader.Load(model);
-            model.winningNumberUpdated();
+            LotteryNumberLoader.calculatePrize(model);
+            LotteryNumberLoader.LoadWinningNumber(model);
 
             SizedBox loadingBox = SizedBox(
               width: 20, height: 20,

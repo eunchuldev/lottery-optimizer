@@ -185,7 +185,7 @@ int getPrize(TicketSet tickets){
       prize = 5;
     else if(sames==4)
       prize = 4;
-    else if(sames==5)
+    else if(sames==5 && !(list.contains(set.bonus)))
       prize = 3;
     else if(sames==5 && list.contains(set.bonus))
       prize = 2;

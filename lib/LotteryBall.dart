@@ -136,7 +136,19 @@ class LotteryNumberLoader{
     return round;
   }
 
-  static Load(AppState app) async{
+  static calculatePrize(AppState model) async{
+    bool changed = false;
+    for(TicketSet ticket in model.favorites){
+      if(ticket.prize != 0)
+        continue;
+      ticket.calculatePrize();
+      changed = true;
+    }
+    if(changed)
+      model.prizeUpdated();
+  }
+
+  static LoadWinningNumber(AppState model) async{
     int now = getLastRound(DateTime.now()) - 1;
     if(now == round)
       return;
@@ -147,11 +159,10 @@ class LotteryNumberLoader{
     else
       until = round;
 
-    round = now;
     if(from == 0)
       from = until;
 
-    for(int i=until + 1; i<now; i++){
+    for(int i=until + 1; i<=now; i++){
       http.Response response = await http.get("https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo="+i.toString());
       if(response.statusCode != 200){
         round = i - 1;
@@ -193,8 +204,13 @@ class LotteryNumberLoader{
         balls.bonus = int.parse(element.text);
       });
 
+      if(balls.numbers.length < 6)
+        return;
+
       list[i] = balls;
+      round = i;
+      model.winningNumberUpdated();
+      calculatePrize(model);
     }
-    app.winningNumberUpdated();
   }
 }

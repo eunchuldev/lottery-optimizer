@@ -21,7 +21,7 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    LotteryNumberLoader.Load(model);
+    LotteryNumberLoader.LoadWinningNumber(model);
     return ScopedModel<AppState>(
       model: model,
       child: MaterialApp(
