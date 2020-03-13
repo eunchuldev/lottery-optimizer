@@ -129,7 +129,7 @@ class LotteryNumberLoader{
     DateTime day = DateTime(time.year,time.month,time.day+7);
     DateTime from = DateTime(2020,3,7,8,41);
     int round = (day.millisecondsSinceEpoch - from.millisecondsSinceEpoch)~/(1000*60*60*24*7) + 901;
-    return round;
+    return round-2;
   }
 
   static void Load() async{

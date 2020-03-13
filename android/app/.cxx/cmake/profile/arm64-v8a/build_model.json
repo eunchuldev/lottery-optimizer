@@ -1,0 +1,70 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/home/song/Projects/lottery_optimizer/android",
+      "sdkFolder": "/home/song/Android/Sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/home/song/Projects/lottery_optimizer/build/app/intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "/home/song/Projects/lottery_optimizer/android/app",
+      "makeFile": "/home/song/Projects/lottery_optimizer/android/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/home/song/Projects/lottery_optimizer/android/.cxx",
+      "cxxFolder": "/home/song/Projects/lottery_optimizer/android/app/.cxx",
+      "ndkFolder": "/home/song/Android/Sdk/ndk/21.0.6113669",
+      "ndkVersion": "21.0.6113669",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [],
+    "variantName": "profile",
+    "soFolder": "/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/profile/lib",
+    "objFolder": "/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/profile/obj",
+    "jsonFolder": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile",
+    "gradleBuildOutputFolder": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARM64_V8A",
+  "abiPlatformVersion": 16,
+  "cxxBuildFolder": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a",
+  "jsonFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a",
+  "objFolder": "/home/song/Projects/lottery_optimizer/build/app/intermediates/cmake/profile/obj/arm64-v8a",
+  "buildCommandFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/build_command.txt",
+  "buildOutputFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/build_output.txt",
+  "modelOutputFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/CMakeLists.txt",
+    "toolchainWrapperFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/build_generation_state.json",
+    "cacheKeyFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/compiler_cache_key.json",
+    "compilerCacheUseFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cxx/profile/arm64-v8a/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/json_generation_record.json",
+  "compileCommandsJsonFile": "/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/arm64-v8a/compile_commands.json"
+}

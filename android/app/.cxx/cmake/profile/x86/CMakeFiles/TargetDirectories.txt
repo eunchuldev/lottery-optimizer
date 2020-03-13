@@ -1,0 +1,3 @@
+/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/x86/CMakeFiles/edit_cache.dir
+/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/x86/CMakeFiles/rebuild_cache.dir
+/home/song/Projects/lottery_optimizer/android/app/.cxx/cmake/profile/x86/CMakeFiles/verify.dir

@@ -96,6 +96,7 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
   @override
   void initState() {
     super.initState();
+    LotteryNumberLoader.Load();
     /*FirebaseAdMob.instance.initialize(appId: appId);
     _bannerAd = bannerAd()
       ..load()

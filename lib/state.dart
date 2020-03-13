@@ -21,6 +21,7 @@ class AppState extends Model {
     _save();
   }
   void coverageUpdated() {
+    _initialize();
     notifyListeners();
   }
   List<TicketSet> get favorites {
@@ -28,13 +29,20 @@ class AppState extends Model {
   }
   _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var jsonData = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
-    _favorites = jsonData['favorites']?.map((ticketJson) =>
-      TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
+    String data = prefs.getString("flutter.lottery_optimizer_app_state");
+    if(data != null) {
+      var jsonData = json.decode(data);
+      _favorites = jsonData['favorites']?.map((ticketJson) =>
+        TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
+    }
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("flutter.lottery_optimizer_app_state", json.encode(toJson()));
+  }
+  _initialize() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("flutter.lottery_optimizer_app_state");
   }
   Map<String, dynamic> toJson() => {
     'favorites': favorites.map((ticketSet)=>ticketSet.toJson()).toList(),
