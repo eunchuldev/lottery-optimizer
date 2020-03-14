@@ -52,8 +52,8 @@ class AppState extends Model {
       TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
     LotteryNumberLoader.list = jsonData['winnings']?.map((winningJson)=>
       LotterySet.fromJson(winningJson))?.toList()?.cast<LotterySet>()??[];
-    LotteryNumberLoader.from = jsonData['winningsFrom'];
-    LotteryNumberLoader.round = jsonData['winningsTo'];
+    LotteryNumberLoader.from = jsonData['winningsFrom'] as int;
+    LotteryNumberLoader.round = jsonData['winningsTo'] as int;
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -150,7 +150,6 @@ class TicketSet {
     _coverage2thPrize = _coverage3thPrize;
     _coverage4thPrize = await compute(coverageN_6_4,  _tickets);
     _coverage5thPrize = await compute(coverage5thPrizeD,  _tickets);
-    calculatePrize();
     return _coverage5thPrize;
   }
   void calculatePrize() async{

@@ -45,7 +45,7 @@ class _MyApp extends State<MyApp> with AutomaticKeepAliveClientMixin<MyApp> {
             ),
             body: TabBarView(
               children: [
-                Favorites(),
+                Favorites(model),
                 TicketsGenerator(),
                 About(),
               ],

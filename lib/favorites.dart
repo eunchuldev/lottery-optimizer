@@ -5,6 +5,10 @@ import 'LotteryBall.dart';
 import 'state.dart';
 
 class Favorites extends StatefulWidget {
+  final AppState model;
+
+  Favorites(this.model);
+
   @override
   State<StatefulWidget> createState() => _Favorites();
 }
@@ -22,6 +26,8 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
     super.build(context);
 
     int round = LotteryNumberLoader.round;
+    LotteryNumberLoader.LoadWinningNumber(widget.model);
+    LotteryNumberLoader.calculatePrize(widget.model);
 
     TextStyle font = TextStyle(fontSize: 15);
 
@@ -36,9 +42,6 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
       ),),
       body: ScopedModelDescendant<AppState>(
           builder: (context, child, model) {
-            LotteryNumberLoader.calculatePrize(model);
-            LotteryNumberLoader.LoadWinningNumber(model);
-
             SizedBox loadingBox = SizedBox(
               width: 20, height: 20,
               child: CircularProgressIndicator(),
@@ -64,13 +67,15 @@ class _Favorites extends State<Favorites> with AutomaticKeepAliveClientMixin<Fav
                             LotteryBall().make(number),
                         )?.toList() ?? [],
                       ),
-                      ticket.coverage5thPrize == null? loadingBox :
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              Text("${(ticket.coverage5thPrize*100/8145060).toStringAsFixed(1)}%"),
-                              LotteryNumberLoader.getLastRound(model.favorites[index].createdAt)>round?Row():
-                                ticket.prize==0?loadingBox:Text(ticket.prize == 6?"꽝":ticket.prize.toString()+"등")
+                              ticket.coverage5thPrize == null
+                                  ? loadingBox
+                                  : Text("${(ticket.coverage5thPrize*100/8145060).toStringAsFixed(1)}%"),
+                              LotteryNumberLoader.getLastRound(model.favorites[index].createdAt)>round
+                                  ? Row()
+                                  : ticket.prize==0?loadingBox:Text(ticket.prize == 6?"꽝":ticket.prize.toString()+"등")
                             ],
                           )
                       ,
