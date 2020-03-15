@@ -38,22 +38,17 @@ class AppState extends Model {
   }
   void prizeUpdated(){
     notifyListeners();
+    _save();
   }
   List<TicketSet> get favorites {
     return List.from(_favorites);
-  }
-  List<LotterySet> get winningNumbers{
-    return List.from(LotteryNumberLoader.list);
   }
   _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var jsonData = json.decode(prefs.getString("flutter.lottery_optimizer_app_state"));
     _favorites = jsonData['favorites']?.map((ticketJson) =>
       TicketSet.fromJson(ticketJson))?.toList()?.cast<TicketSet>() ?? [];
-    LotteryNumberLoader.list = jsonData['winnings']?.map((winningJson)=>
-      LotterySet.fromJson(winningJson))?.toList()?.cast<LotterySet>()??[];
-    LotteryNumberLoader.from = jsonData['winningsFrom'] as int;
-    LotteryNumberLoader.round = jsonData['winningsTo'] as int;
+    LotteryNumberLoader.readJson(jsonData['winnings']);
   }
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -61,9 +56,7 @@ class AppState extends Model {
   }
   Map<String, dynamic> toJson() => {
     'favorites': favorites.map((ticketSet)=>ticketSet.toJson()).toList(),
-    'winnings' : winningNumbers.map((lotterySet) =>lotterySet?.toJson()).toList(),
-    'winningsFrom':LotteryNumberLoader.from,
-    'winningsTo':LotteryNumberLoader.round
+    'winnings' : LotteryNumberLoader.toJson(),
   };
   AppState() {
     _load();

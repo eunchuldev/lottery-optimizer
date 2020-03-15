@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
@@ -120,7 +122,36 @@ class LotterySet{
 }
 
 class LotteryNumberLoader{
-  static List<LotterySet> list = List(99999);
+  static bool _readJson = false;
+
+  static Map<String, dynamic> _setToJson(int round, LotterySet set) =>{
+    'round':round,
+    'set':set.toJson()
+  };
+  static List<Map<String, dynamic>> _listToJson(HashMap<int, LotterySet> oldList){
+    List<Map<String, dynamic>> list = List();
+    oldList.forEach((key, value) {list.add(_setToJson(key,value));});
+    return list;
+  }
+  static Map<String, dynamic> toJson() => {
+    'from':from,
+    'to':round,
+    'set':_listToJson(list)
+  };
+  static void readJson(Map<String, dynamic> json){
+    if(json == null){
+      _readJson = true;
+      return;
+    }
+    from = json['from'];
+    round = json['to'];
+    json['set']?.map((set){list[set['from']] = set['to'];});
+
+    debugPrint("ROUND : " + from.toString()+ "~" + round.toString());
+    _readJson = true;
+  }
+
+  static HashMap<int, LotterySet> list = HashMap();
 
   static int from = 0;
   static int round = 0;
@@ -149,6 +180,9 @@ class LotteryNumberLoader{
   }
 
   static LoadWinningNumber(AppState model) async{
+    if(!_readJson)
+      return;
+
     int now = getLastRound(DateTime.now()) - 1;
     if(now == round)
       return;
@@ -209,8 +243,8 @@ class LotteryNumberLoader{
 
       list[i] = balls;
       round = i;
-      model.winningNumberUpdated();
       calculatePrize(model);
     }
+    model.winningNumberUpdated();
   }
 }
