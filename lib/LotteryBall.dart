@@ -111,9 +111,13 @@ class LotterySet{
 
   LotterySet();
 
-  LotterySet.fromJson(Map<String, dynamic> json)
-      : numbers = json['tickets'].map((ticket) => ticket.cast<int>()).toList(),
-        bonus = json['bonus'];
+  LotterySet.fromJson(Map<String, dynamic> json){
+    List<int> list = List();
+    for(int i in json['tickets'])
+      list.add(i);
+    numbers = list;
+    bonus = json['bonus'];
+  }
 
   Map<String, dynamic> toJson() => {
     'tickets': numbers,
@@ -123,38 +127,35 @@ class LotterySet{
 
 class LotteryNumberLoader{
   static bool _readJson = false;
+  static HashMap<int, LotterySet> list = HashMap();
 
-  static Map<String, dynamic> _setToJson(int round, LotterySet set) =>{
-    'round':round,
-    'set':set.toJson()
-  };
-  static List<Map<String, dynamic>> _listToJson(HashMap<int, LotterySet> oldList){
-    List<Map<String, dynamic>> list = List();
-    oldList.forEach((key, value) {list.add(_setToJson(key,value));});
-    return list;
+  static int from = 0;
+  static int round = 0;
+
+  static List<Map<String,dynamic>> _listToJson(HashMap<int,LotterySet> oldList){
+    List<Map<String,dynamic>> temp = List();
+    oldList.forEach((key, value) {
+      temp.add({'round':key,'set':value.toJson()});
+    });
+    return temp;
   }
   static Map<String, dynamic> toJson() => {
     'from':from,
     'to':round,
     'set':_listToJson(list)
   };
-  static void readJson(Map<String, dynamic> json){
-    if(json == null){
+  static void readJson(Map<String, dynamic> file){
+    if(file == null){
       _readJson = true;
       return;
     }
-    from = json['from'];
-    round = json['to'];
-    json['set']?.map((set){list[set['from']] = set['to'];});
-
-    debugPrint("ROUND : " + from.toString()+ "~" + round.toString());
+    from = file['from'];
+    round = file['to'];
+    for(Map<String, dynamic> set in file['set']){
+      list[set['round']] = LotterySet.fromJson(set['set']);
+    }
     _readJson = true;
   }
-
-  static HashMap<int, LotterySet> list = HashMap();
-
-  static int from = 0;
-  static int round = 0;
 
   static int getRound(){
     return round;
@@ -243,8 +244,8 @@ class LotteryNumberLoader{
 
       list[i] = balls;
       round = i;
-      calculatePrize(model);
     }
     model.winningNumberUpdated();
+    calculatePrize(model);
   }
 }
